@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#090d16"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+
+    <!-- Vibrant Cyan-Teal-Emerald Gradient -->
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="45%" stop-color="#06b6d4"/>
+      <stop offset="80%" stop-color="#14b8a6"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+
+    <!-- Glowing Amber Accent Gradient -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+
+    <!-- Compass Ring Metallic Gradient -->
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#06b6d4" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="softGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Rounded Squircle Base with Glowing Border -->
+  <rect x="24" y="24" width="464" height="464" rx="120" fill="url(#bgGrad)" stroke="url(#primaryGrad)" stroke-width="8" stroke-opacity="0.7"/>
+  
+  <!-- Outer Compass Ring -->
+  <circle cx="256" cy="256" r="172" fill="none" stroke="url(#ringGrad)" stroke-width="5" stroke-dasharray="16 10" opacity="0.8"/>
+  
+  <!-- Inner Coordinate Fill -->
+  <circle cx="256" cy="256" r="142" fill="#082f49" fill-opacity="0.3" stroke="#38bdf8" stroke-width="2.5" stroke-opacity="0.4"/>
+
+  <!-- Compass Cardinal Tick Marks -->
+  <line x1="256" y1="72" x2="256" y2="96" stroke="#38bdf8" stroke-width="5" stroke-linecap="round"/>
+  <line x1="256" y1="416" x2="256" y2="440" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+  <line x1="72" y1="256" x2="96" y2="256" stroke="#38bdf8" stroke-width="5" stroke-linecap="round"/>
+  <line x1="416" y1="256" x2="440" y2="256" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Mountain Peaks / Waypoints Silhouette -->
+  <path d="M140 330 L200 245 L250 310 L300 230 L372 330 Z" fill="url(#primaryGrad)" fill-opacity="0.2" stroke="url(#primaryGrad)" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Flowing River Wave Curve at bottom -->
+  <path d="M120 360 Q 200 320 256 360 T 392 360" fill="none" stroke="url(#primaryGrad)" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Main Compass Needle / Soaring Travel Arrow -->
+  <!-- North Arrow (Glowing Cyan-Teal) -->
+  <polygon points="256,108 300,246 256,220 212,246" fill="url(#primaryGrad)" filter="url(#softGlow)"/>
+  <polygon points="256,108 256,220 212,246" fill="#7dd3fc" opacity="0.9"/>
+  
+  <!-- South Arrow (Slate-Navy with Teal Rim) -->
+  <polygon points="256,404 212,266 256,292 300,266" fill="#1e293b" stroke="#06b6d4" stroke-width="2"/>
+  <polygon points="256,404 256,292 212,266" fill="#0f172a"/>
+
+  <!-- Central Pivot Pin with Amber Star Sparkle -->
+  <circle cx="256" cy="256" r="26" fill="#090d16" stroke="url(#primaryGrad)" stroke-width="6" filter="url(#softGlow)"/>
+  <circle cx="256" cy="256" r="14" fill="url(#accentGrad)"/>
+  
+  <!-- Floating AI Magic Sparkle (Top Right) -->
+  <path d="M375 125 Q 375 145 395 145 Q 375 145 375 165 Q 375 145 355 145 Q 375 145 375 125 Z" fill="url(#accentGrad)" filter="url(#softGlow)"/>
+</svg>
