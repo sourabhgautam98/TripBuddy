@@ -77,6 +77,8 @@ export interface Restaurant {
   photoUrl?: string;
   mealType?: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   recommendedDish?: string;
+  localityBadge?: string;
+  proximity?: string;
 }
 
 export interface MealRecommendation {
@@ -118,6 +120,8 @@ export interface BikeRental {
   mapsUrl?: string;
   website?: string;
   typesAvailable?: string[];
+  localityBadge?: string;
+  proximity?: string;
 }
 
 export interface CarRental {
@@ -132,6 +136,8 @@ export interface CarRental {
   mapsUrl?: string;
   website?: string;
   typesAvailable?: string[];
+  localityBadge?: string;
+  proximity?: string;
 }
 
 export interface PublicTransitLine {
@@ -149,6 +155,7 @@ export interface PublicTransitInfo {
   metroLines?: string[];
   popularBuses?: PublicTransitLine[];
   tips?: string[];
+  areaServed?: string;
 }
 
 export interface Hotel {
@@ -162,6 +169,8 @@ export interface Hotel {
   priceLevel?: string;
   mapsUrl?: string;
   isOrigin?: boolean;
+  localityBadge?: string;
+  proximity?: string;
 }
 
 export interface BudgetBreakdown {
@@ -185,6 +194,12 @@ export interface TripPreferences {
   customPrompt?: string;
   hotelBooked?: boolean;
   hotelLocation?: string;
+  userLocation?: {
+    latitude: number;
+    longitude: number;
+    area?: string;
+    city?: string;
+  };
 }
 
 export interface Destination {
@@ -196,6 +211,9 @@ export interface Destination {
   coverImage?: string;
   tagline?: string;
   popularInterests?: string[];
+  areaName?: string;
+  parentCity?: string;
+  isLocalizedArea?: boolean;
 }
 
 export type TripStatus = 'planning' | 'generating' | 'ready' | 'error';

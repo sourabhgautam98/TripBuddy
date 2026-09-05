@@ -73,16 +73,30 @@ export function RestaurantRecommendationCard({ restaurants, destinationName }: R
                   </span>
                 )}
               </div>
+
+              {rest.localityBadge && (
+                <div className="mb-1.5">
+                  <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    {rest.localityBadge}
+                  </span>
+                </div>
+              )}
+
               <p className="text-[11px] text-amber-300/90 font-medium truncate mb-1">
                 {rest.cuisine || 'Local Specialties'}
               </p>
+              {rest.recommendedDish && (
+                <p className="text-[10px] text-emerald-400 font-medium line-clamp-1 mb-1">
+                  ✨ Must try: {rest.recommendedDish}
+                </p>
+              )}
               <p className="text-[11px] text-slate-400 line-clamp-1 mb-2 leading-relaxed">
                 {rest.address || `Central ${destinationName}`}
               </p>
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-[11px]">
-              <span className="text-slate-400">Authentic Taste</span>
+              <span className="text-slate-400">{rest.priceLevel || 'Authentic Taste'}</span>
 
               <a
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(

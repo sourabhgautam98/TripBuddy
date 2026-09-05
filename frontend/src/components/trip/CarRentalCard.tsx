@@ -38,6 +38,15 @@ export function CarRentalCard({ rentals }: CarRentalCardProps) {
                   Verified
                 </span>
               </div>
+
+              {rental.localityBadge && (
+                <div className="mb-1.5">
+                  <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                    {rental.localityBadge}
+                  </span>
+                </div>
+              )}
+
               <p className="text-[11px] text-slate-400 line-clamp-1 mb-2">
                 {rental.address}
               </p>

@@ -2,6 +2,26 @@ import { Trip, OptimizationMetrics, Destination } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
+export interface LocationSuggestion {
+  name: string;
+  subTitle: string;
+  city: string;
+  area?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface GeocodeResult {
+  locality?: string;
+  suburb?: string;
+  city: string;
+  state?: string;
+  country: string;
+  formattedName: string;
+  latitude: number;
+  longitude: number;
+}
+
 export const api = {
   async createTrip(payload: {
     destination: string;
@@ -12,6 +32,12 @@ export const api = {
       transport: string;
       pace: string;
       customPrompt?: string;
+      userLocation?: {
+        latitude: number;
+        longitude: number;
+        area?: string;
+        city?: string;
+      };
     };
   }): Promise<Trip> {
     const res = await fetch(`${API_BASE_URL}/api/trips`, {
@@ -125,5 +151,31 @@ export const api = {
 
     const data = await res.json();
     return data.data;
+  },
+
+  async reverseGeocode(lat: number, lng: number): Promise<GeocodeResult> {
+    const res = await fetch(`${API_BASE_URL}/api/places/reverse-geocode?lat=${lat}&lng=${lng}`, {
+      cache: 'no-store',
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to reverse geocode location');
+    }
+
+    const data = await res.json();
+    return data.data;
+  },
+
+  async autocompleteLocations(query: string): Promise<LocationSuggestion[]> {
+    const res = await fetch(`${API_BASE_URL}/api/places/autocomplete?query=${encodeURIComponent(query)}`, {
+      cache: 'no-store',
+    });
+
+    if (!res.ok) {
+      return [];
+    }
+
+    const data = await res.json();
+    return data.data || [];
   },
 };

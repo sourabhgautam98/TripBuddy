@@ -55,4 +55,41 @@ export const placeController = {
       data: list,
     });
   },
+
+  async reverseGeocode(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const lat = parseFloat(String(req.query.lat));
+      const lng = parseFloat(String(req.query.lng));
+
+      if (isNaN(lat) || isNaN(lng)) {
+        res.status(400).json({ success: false, error: 'Valid lat and lng query parameters are required' });
+        return;
+      }
+
+      const { geocodingService } = await import('../services/google/geocoding.service.js');
+      const result = await geocodingService.reverseGeocode(lat, lng);
+
+      res.json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async autocomplete(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const query = String(req.query.query || '');
+      const { geocodingService } = await import('../services/google/geocoding.service.js');
+      const suggestions = await geocodingService.autocomplete(query);
+
+      res.json({
+        success: true,
+        data: suggestions,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

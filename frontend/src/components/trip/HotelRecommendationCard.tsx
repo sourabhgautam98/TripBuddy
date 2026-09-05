@@ -73,13 +73,22 @@ export function HotelRecommendationCard({ hotels, destinationName }: HotelRecomm
                   </span>
                 )}
               </div>
+
+              {hotel.localityBadge && (
+                <div className="mb-1.5">
+                  <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                    {hotel.localityBadge}
+                  </span>
+                </div>
+              )}
+
               <p className="text-[11px] text-slate-400 line-clamp-2 mb-3 leading-relaxed">
                 {hotel.address || `Central ${destinationName}`}
               </p>
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-[11px]">
-              <span className="text-purple-300 font-medium">Boutique Stay</span>
+              <span className="text-purple-300 font-medium">{hotel.priceLevel || 'Boutique Stay'}</span>
 
               <a
                 href={

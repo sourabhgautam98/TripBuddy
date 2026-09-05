@@ -42,6 +42,15 @@ export function BikeRentalCard({ rentals }: BikeRentalCardProps) {
                   </span>
                 )}
               </div>
+
+              {rental.localityBadge && (
+                <div className="mb-1.5">
+                  <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                    {rental.localityBadge}
+                  </span>
+                </div>
+              )}
+
               <p className="text-[11px] text-slate-400 truncate mb-2">{rental.address}</p>
 
               {rental.typesAvailable && (
@@ -60,10 +69,13 @@ export function BikeRentalCard({ rentals }: BikeRentalCardProps) {
 
             <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-[11px]">
               {rental.phone ? (
-                <span className="text-slate-300 font-mono flex items-center gap-1">
+                <a
+                  href={`tel:${rental.phone}`}
+                  className="text-slate-300 hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors"
+                >
                   <Phone className="w-3 h-3 text-cyan-400" />
-                  {rental.phone}
-                </span>
+                  <span>{rental.phone}</span>
+                </a>
               ) : (
                 <span className="text-slate-500">Walk-in available</span>
               )}

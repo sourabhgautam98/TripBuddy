@@ -117,7 +117,7 @@ export const travelAgentService = {
         location: destination,
       });
 
-      // 4. Transport Specific Recommendations
+      // 4. Transport & Mobility Recommendations (Populating all modes for seamless tab switching)
       let bikeRentals: BikeRental[] = [];
       let carRentals: CarRental[] = [];
       let publicTransit: PublicTransitInfo | undefined;
@@ -130,6 +130,9 @@ export const travelAgentService = {
         );
         bikeRentals = await toolRegistry.searchBikeRentals.execute({ location: destination });
         await emitStep('rentals_found', `✅ Found ${bikeRentals.length} verified two-wheeler rental hubs.`);
+        // Background populate car and transit
+        carRentals = await toolRegistry.searchCarRentals.execute({ location: destination });
+        publicTransit = await toolRegistry.searchPublicTransit.execute({ location: destination });
       } else if (transportMode === 'car') {
         await emitStep(
           'finding_rentals',
@@ -138,7 +141,10 @@ export const travelAgentService = {
         );
         carRentals = await toolRegistry.searchCarRentals.execute({ location: destination });
         await emitStep('rentals_found', `✅ Found ${carRentals.length} car rental & cab providers.`);
-      } else if (transportMode === 'public') {
+        // Background populate bike and transit
+        bikeRentals = await toolRegistry.searchBikeRentals.execute({ location: destination });
+        publicTransit = await toolRegistry.searchPublicTransit.execute({ location: destination });
+      } else {
         await emitStep(
           'finding_rentals',
           `🚌 Mapping local public city bus and metro transit lines for ${destination}...`,
@@ -146,6 +152,9 @@ export const travelAgentService = {
         );
         publicTransit = await toolRegistry.searchPublicTransit.execute({ location: destination });
         await emitStep('rentals_found', `✅ Mapped local city buses and transit lines.`);
+        // Background populate bike and car
+        bikeRentals = await toolRegistry.searchBikeRentals.execute({ location: destination });
+        carRentals = await toolRegistry.searchCarRentals.execute({ location: destination });
       }
 
       await emitStep(
@@ -168,8 +177,8 @@ export const travelAgentService = {
       );
 
       const destMeta = getDestinationData(destination);
-      const centerLat = places[0]?.latitude || destMeta.center.latitude || 30.3165;
-      const centerLng = places[0]?.longitude || destMeta.center.longitude || 78.0322;
+      const centerLat = trip.preferences.userLocation?.latitude || places[0]?.latitude || destMeta.center.latitude || 26.9124;
+      const centerLng = trip.preferences.userLocation?.longitude || places[0]?.longitude || destMeta.center.longitude || 75.7873;
       const destCover = places[0]?.photoUrl || destMeta.coverImage;
 
       const updatedTrip = await TripRepository.update(tripId, {
@@ -180,13 +189,16 @@ export const travelAgentService = {
         carRentals,
         publicTransit,
         destination: {
-          name: destination.charAt(0).toUpperCase() + destination.slice(1),
+          name: destMeta.name || destination.charAt(0).toUpperCase() + destination.slice(1),
           country: places[0]?.address?.split(',').pop()?.trim() || destMeta.country || 'India',
           latitude: centerLat,
           longitude: centerLng,
           tagline: destMeta.tagline || `Discover ${destination} with verified sights, opening hours and transit.`,
           coverImage: destCover,
           popularInterests: trip.preferences.interests,
+          areaName: destMeta.areaName,
+          parentCity: destMeta.parentCity,
+          isLocalizedArea: destMeta.isLocalizedArea,
         },
         status: 'ready',
       });

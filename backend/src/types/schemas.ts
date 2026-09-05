@@ -17,6 +17,14 @@ export const TripPreferencesSchema = z.object({
   customPrompt: z.string().optional(),
   hotelBooked: z.boolean().optional(),
   hotelLocation: z.string().optional(),
+  userLocation: z
+    .object({
+      latitude: z.number(),
+      longitude: z.number(),
+      area: z.string().optional(),
+      city: z.string().optional(),
+    })
+    .optional(),
 });
 
 export const TravelSegmentSchema = z.object({

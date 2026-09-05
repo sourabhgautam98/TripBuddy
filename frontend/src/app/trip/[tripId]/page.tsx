@@ -39,10 +39,15 @@ export default function TripPage() {
   const [optimizationMetrics, setOptimizationMetrics] = useState<OptimizationMetrics | null>(null);
   const [isOptimizationModalOpen, setIsOptimizationModalOpen] = useState(false);
 
+  const [activeTransportTab, setActiveTransportTab] = useState<string>('bike');
+
   const fetchTrip = async () => {
     try {
       const data = await api.getTrip(tripId);
       setTrip(data);
+      if (data.preferences?.transport) {
+        setActiveTransportTab(data.preferences.transport);
+      }
       if (data.itinerary?.[0]?.activities?.[0]) {
         setActiveActivityId(data.itinerary[0].activities[0].id);
       }
@@ -148,16 +153,55 @@ export default function TripPage() {
         destinationName={trip.destination.name}
       />
 
-      {/* Transport-Specific Recommendation Card */}
-      {trip.preferences.transport === 'bike' && (
-        <BikeRentalCard rentals={trip.bikeRentals} />
-      )}
-      {trip.preferences.transport === 'car' && (
-        <CarRentalCard rentals={trip.carRentals} />
-      )}
-      {trip.preferences.transport === 'public' && (
-        <PublicTransitCard transit={trip.publicTransit} />
-      )}
+      {/* Local Transport & Rental Mobility Hub */}
+      <div className="mb-6 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+              Local Mobility & Rental Options:
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-slate-800">
+            <button
+              type="button"
+              onClick={() => setActiveTransportTab('bike')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                activeTransportTab === 'bike'
+                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              🏍️ Bike / Scooter
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTransportTab('car')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                activeTransportTab === 'car'
+                  ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              🚗 Car Rentals & Cabs
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTransportTab('public')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                activeTransportTab === 'public'
+                  ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              🚌 City Bus & Metro
+            </button>
+          </div>
+        </div>
+
+        {activeTransportTab === 'bike' && <BikeRentalCard rentals={trip.bikeRentals} />}
+        {activeTransportTab === 'car' && <CarRentalCard rentals={trip.carRentals} />}
+        {activeTransportTab === 'public' && <PublicTransitCard transit={trip.publicTransit} />}
+      </div>
 
       {/* Main Split View: Timeline (Left) & Interactive Map (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

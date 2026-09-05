@@ -42,9 +42,16 @@ export function TripHeader({ trip, onOptimizeClick, isOptimizing }: TripHeaderPr
       <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           {/* Destination Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-3">
-            <MapPin className="w-3.5 h-3.5" />
-            <span>{trip.destination.name}, {trip.destination.country || 'India'}</span>
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold uppercase tracking-wider">
+              <MapPin className="w-3.5 h-3.5" />
+              <span>{trip.destination.name}, {trip.destination.country || 'India'}</span>
+            </div>
+            {trip.destination.isLocalizedArea && (
+              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                📍 Hyper-Local Area Itinerary
+              </span>
+            )}
           </div>
 
           <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight mb-2">

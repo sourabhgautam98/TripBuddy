@@ -17,12 +17,33 @@ export function PublicTransitCard({ transit }: PublicTransitCardProps) {
           <Bus className="w-4 h-4" />
         </div>
         <div>
-          <h4 className="font-bold text-sm text-white">Public Transit & City Bus Routes for {transit.destination}</h4>
+          <div className="flex items-center gap-2 mb-0.5">
+            <h4 className="font-bold text-sm text-white">Public Transit & City Bus Routes</h4>
+            {transit.areaServed && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                📍 Serving {transit.areaServed}
+              </span>
+            )}
+          </div>
           <p className="text-[11px] text-slate-400">
             {transit.transitSummary || 'Local buses, metro lines, and feeder routes connecting tourist attractions'}
           </p>
         </div>
       </div>
+
+      {transit.metroLines && transit.metroLines.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-3.5">
+          {transit.metroLines.map((line, idx) => (
+            <div
+              key={idx}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-900/90 border border-slate-800 text-[11px] text-teal-300 font-medium"
+            >
+              <Train className="w-3.5 h-3.5 text-teal-400" />
+              <span>{line}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {transit.popularBuses && transit.popularBuses.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">

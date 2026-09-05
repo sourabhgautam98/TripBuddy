@@ -58,19 +58,23 @@ export const itineraryService = {
       }
     }
 
+    const parentCity = destinationName.includes(',')
+      ? destinationName.split(',').pop()!.trim()
+      : destinationName.trim();
+
     // 1. Gather Custom-Matching Places if customPrompt is present
     let customMatchingPlaces: Place[] = [];
     if (hasCustomPrompt && customPrompt) {
       const customQueries = [
-        `${customPrompt} in ${destinationName}`,
-        `${customKeyword} attractions in ${destinationName}`,
-        `scenic ${customKeyword} spots in ${destinationName}`,
+        `${customPrompt} in ${parentCity}`,
+        `${customKeyword} attractions in ${parentCity}`,
+        `scenic ${customKeyword} spots in ${parentCity}`,
       ];
 
       for (const query of customQueries) {
         const fetched = await placesService.searchPlaces({
           query,
-          location: destinationName,
+          location: parentCity,
         });
         for (const p of fetched) {
           if (!customMatchingPlaces.some((item) => (item.placeId && item.placeId === p.placeId) || item.name.toLowerCase() === p.name.toLowerCase())) {
@@ -80,25 +84,57 @@ export const itineraryService = {
       }
     }
 
-    // 2. Gather General Top Sights & Landmarks
+    // 2. Gather Top Verified Sights & Landmarks for the City based on User Interests
     let generalPlaces = await placesService.searchPlaces({
-      query: `top tourist attractions in ${destinationName}`,
-      location: destinationName,
+      query: `top tourist attractions in ${parentCity}`,
+      location: parentCity,
     });
 
+    // Interest-specific queries for city landmarks
+    const interestQueries: string[] = [];
+    if (preferences.interests && preferences.interests.length > 0) {
+      for (const interest of preferences.interests) {
+        const intLower = interest.toLowerCase();
+        if (intLower.includes('history') || intLower.includes('historical')) {
+          interestQueries.push(`famous historical forts and palaces in ${parentCity}`);
+        } else if (intLower.includes('culture') || intLower.includes('art')) {
+          interestQueries.push(`cultural heritage museums and arts in ${parentCity}`);
+        } else if (intLower.includes('nature') || intLower.includes('scenic') || intLower.includes('outdoor')) {
+          interestQueries.push(`scenic gardens and nature viewpoints in ${parentCity}`);
+        } else if (intLower.includes('photo')) {
+          interestQueries.push(`iconic photography and sunset viewpoints in ${parentCity}`);
+        } else if (intLower.includes('shop') || intLower.includes('bazaar')) {
+          interestQueries.push(`traditional shopping bazaars in ${parentCity}`);
+        }
+      }
+    }
+
+    for (const query of interestQueries) {
+      const extra = await placesService.searchPlaces({
+        query,
+        location: parentCity,
+      });
+
+      for (const p of extra) {
+        if (!generalPlaces.some((item) => (item.placeId && item.placeId === p.placeId) || item.name.toLowerCase() === p.name.toLowerCase())) {
+          generalPlaces.push(p);
+        }
+      }
+    }
+
     if (generalPlaces.length < totalPlacesNeeded) {
-      const extraQueries = [
-        `famous historical landmarks in ${destinationName}`,
-        `popular sightseeing places in ${destinationName}`,
-        `scenic viewpoints and parks in ${destinationName}`,
-        `cultural heritage and temples in ${destinationName}`,
+      const fallbackQueries = [
+        `famous historical landmarks in ${parentCity}`,
+        `popular sightseeing places in ${parentCity}`,
+        `scenic viewpoints and parks in ${parentCity}`,
+        `cultural heritage and temples in ${parentCity}`,
       ];
 
-      for (const query of extraQueries) {
+      for (const query of fallbackQueries) {
         if (generalPlaces.length >= totalPlacesNeeded + 10) break;
         const extra = await placesService.searchPlaces({
           query,
-          location: destinationName,
+          location: parentCity,
         });
 
         for (const p of extra) {
