@@ -1,8 +1,8 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { Trip } from '../types/index.js';
 import { isDbConnected } from '../config/database.js';
 
-export interface TripDocument extends Omit<Trip, 'id'>, Document {
+export interface TripDocument extends Omit<Trip, 'id'> {
   _id: string;
   id: string;
 }
