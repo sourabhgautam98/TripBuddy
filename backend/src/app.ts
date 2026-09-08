@@ -21,15 +21,16 @@ export function createApp(): express.Application {
     })
   );
 
-  // CORS
   const allowedOrigins = [
-    `${process.env.FRONTEND_URL}/`
-  ];
+    process.env.FRONTEND_URL,
+    'https://trip-buddy-taupe.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+  ].filter((origin): origin is string => Boolean(origin));
 
   const corsOptions: cors.CorsOptions = {
     origin: (origin, callback) => {
-      // Allow requests without Origin header
-      // (Postman, server-to-server, etc.)
+      // Allow requests without an Origin header
       if (!origin) {
         return callback(null, true);
       }
@@ -38,8 +39,8 @@ export function createApp(): express.Application {
         return callback(null, true);
       }
 
-      logger.warn(`CORS blocked request from origin: ${origin} `);
-      return callback(new Error('Not allowed by CORS'));
+      logger.warn(`CORS blocked request from origin: ${origin}`);
+      return callback(new Error(`CORS: Origin ${origin} not allowed`));
     },
 
     credentials: true,
@@ -59,9 +60,8 @@ export function createApp(): express.Application {
   };
 
   app.use(cors(corsOptions));
-
-  // Explicitly handle preflight requests
   app.options('*', cors(corsOptions));
+
 
   // Body parsers
   app.use(express.json({ limit: '5mb' }));
