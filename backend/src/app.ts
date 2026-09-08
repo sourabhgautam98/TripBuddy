@@ -23,7 +23,7 @@ export function createApp(): express.Application {
 
   // CORS
   const allowedOrigins = [
-    process.env.FRONTEND_URL
+    `${process.env.FRONTEND_URL}/`
   ];
 
   const corsOptions: cors.CorsOptions = {
