@@ -38,29 +38,8 @@ Built with the **MERN Stack + Next.js App Router**:
 npm install
 ```
 
-### 2. Configure Environment (Optional)
 
-Copy `.env.example` to `.env`:
-
-```env
-NODE_ENV=development
-PORT=5000
-
-# Optional: MongoDB URI (falls back to persistent in-memory store if omitted)
-MONGODB_URI=mongodb://localhost:27017/travel_agent_ai
-
-# Optional: OpenAI API Key (falls back to built-in deterministic Agent Engine if omitted)
-OPENAI_API_KEY=
-OPENAI_MODEL=gpt-4o
-
-# Optional: Google Maps API Key (falls back to verified geospatial database if omitted)
-GOOGLE_MAPS_API_KEY=
-
-FRONTEND_URL=http://localhost:3000
-NEXT_PUBLIC_API_URL=http://localhost:5000
-```
-
-### 3. Run in Development Mode
+### 2. Run in Development Mode
 
 ```bash
 # Run both backend and frontend concurrently:
