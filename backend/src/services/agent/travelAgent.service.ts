@@ -19,6 +19,7 @@ import { placesService } from '../google/places.service.js';
 import { itineraryService } from '../itinerary/itinerary.service.js';
 import { TripRepository } from '../../models/Trip.model.js';
 import { getDestinationData } from '../google/curatedData.js';
+import { resolveDynamicPhoto } from '../google/imageResolver.service.js';
 
 let openaiClient: OpenAI | null = null;
 if (env.OPENAI_API_KEY) {
@@ -177,9 +178,24 @@ export const travelAgentService = {
       );
 
       const destMeta = getDestinationData(destination);
+      const dynamicCover = await resolveDynamicPhoto(destination);
       const centerLat = trip.preferences.userLocation?.latitude || places[0]?.latitude || destMeta.center.latitude || 26.9124;
       const centerLng = trip.preferences.userLocation?.longitude || places[0]?.longitude || destMeta.center.longitude || 75.7873;
-      const destCover = places[0]?.photoUrl || destMeta.coverImage;
+      const destCover = dynamicCover || places[0]?.photoUrl || destMeta.coverImage;
+
+      // Dynamically resolve authentic photos for activities on the fly
+      for (const day of itinerary) {
+        for (const act of day.activities) {
+          if (!act.photoUrl || act.photoUrl.includes('images.unsplash.com/photo-1544620347-c4fd4a3d5957') || act.photoUrl.includes('images.unsplash.com/photo-1469854523086')) {
+            const dynamicActPhoto = await resolveDynamicPhoto(`${act.title} ${destination}`);
+            if (dynamicActPhoto) {
+              act.photoUrl = dynamicActPhoto;
+              if (!act.photos) act.photos = [];
+              if (!act.photos.includes(dynamicActPhoto)) act.photos.unshift(dynamicActPhoto);
+            }
+          }
+        }
+      }
 
       const updatedTrip = await TripRepository.update(tripId, {
         itinerary,

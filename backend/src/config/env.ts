@@ -15,7 +15,7 @@ export const env = {
   OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
   OPENAI_MODEL: process.env.OPENAI_MODEL || 'gpt-4o',
   GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY || '',
-  RAPIDAPI_KEY: process.env.RAPIDAPI_KEY || '0b7d23b852mshdaf5ec08b02a299p132966jsndc55ef781944',
+  RAPIDAPI_KEY: process.env.RAPIDAPI_KEY || '',
   RAPIDAPI_OPENAI_HOST:
     process.env.RAPIDAPI_OPENAI_HOST ||
     'cheapest-gpt-4-turbo-gpt-4-vision-chatgpt-openai-ai-api.p.rapidapi.com',

@@ -7,7 +7,7 @@ interface TimelineProps {
   dayPlan: DayPlan;
   activeActivityId: string | null;
   onSelectActivity: (id: string) => void;
-  onChangeActivity: (activity: Activity) => void;
+  onChangeActivity?: (activity: Activity) => void;
   onOpenGallery?: (activity: Activity) => void;
 }
 
@@ -15,7 +15,6 @@ export function Timeline({
   dayPlan,
   activeActivityId,
   onSelectActivity,
-  onChangeActivity,
   onOpenGallery,
 }: TimelineProps) {
   const activities = dayPlan.activities || [];
@@ -29,7 +28,6 @@ export function Timeline({
             index={index}
             isActive={activeActivityId === act.id}
             onSelect={() => onSelectActivity(act.id)}
-            onChangeClick={() => onChangeActivity(act)}
             onOpenGallery={() => onOpenGallery && onOpenGallery(act)}
           />
         </div>

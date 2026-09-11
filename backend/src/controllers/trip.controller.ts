@@ -5,12 +5,14 @@ import { travelAgentService } from '../services/agent/travelAgent.service.js';
 import { optimizeItinerary } from '../services/itinerary/itineraryOptimizer.js';
 import { itineraryService } from '../services/itinerary/itinerary.service.js';
 import { getDestinationData } from '../services/google/curatedData.js';
+import { resolveDynamicPhoto } from '../services/google/imageResolver.service.js';
 
 export const tripController = {
   async createTrip(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const parsed = CreateTripInputSchema.parse(req.body);
       const destData = getDestinationData(parsed.destination);
+      const dynamicPhoto = await resolveDynamicPhoto(parsed.destination);
 
       const trip = await TripRepository.create({
         destination: {
@@ -19,7 +21,7 @@ export const tripController = {
           latitude: parsed.preferences.userLocation?.latitude || destData.center.latitude,
           longitude: parsed.preferences.userLocation?.longitude || destData.center.longitude,
           tagline: destData.tagline,
-          coverImage: destData.coverImage,
+          coverImage: dynamicPhoto || destData.coverImage,
           popularInterests: destData.popularInterests,
           areaName: destData.areaName,
           parentCity: destData.parentCity,

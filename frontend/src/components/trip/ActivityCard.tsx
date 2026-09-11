@@ -8,7 +8,7 @@ interface ActivityCardProps {
   index: number;
   isActive: boolean;
   onSelect: () => void;
-  onChangeClick: () => void;
+  onChangeClick?: () => void;
   onOpenGallery?: () => void;
 }
 
@@ -17,7 +17,6 @@ export function ActivityCard({
   index,
   isActive,
   onSelect,
-  onChangeClick,
   onOpenGallery,
 }: ActivityCardProps) {
   const travel = activity.travelFromPrevious;
@@ -119,17 +118,6 @@ export function ActivityCard({
                 <span>View Photos ({photoCount})</span>
               </button>
 
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onChangeClick();
-                }}
-                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-cyan-300 text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-colors"
-              >
-                <RefreshCw className="w-3 h-3" />
-                <span>Change Activity</span>
-              </button>
 
               {activity.mapsUrl && (
                 <a

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Trip, Activity, OptimizationMetrics } from '@/types';
+import { Trip, Activity } from '@/types';
 import { api } from '@/lib/api';
 import { TripHeader } from '@/components/trip/TripHeader';
 import { DayTabs } from '@/components/trip/DayTabs';
@@ -13,8 +13,6 @@ import { RestaurantRecommendationCard } from '@/components/trip/RestaurantRecomm
 import { BikeRentalCard } from '@/components/trip/BikeRentalCard';
 import { CarRentalCard } from '@/components/trip/CarRentalCard';
 import { PublicTransitCard } from '@/components/trip/PublicTransitCard';
-import { ModifyActivityModal } from '@/components/trip/ModifyActivityModal';
-import { OptimizationModal } from '@/components/trip/OptimizationModal';
 import { PhotoGalleryModal } from '@/components/trip/PhotoGalleryModal';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -29,16 +27,7 @@ export default function TripPage() {
   const [activeDay, setActiveDay] = useState(1);
   const [activeActivityId, setActiveActivityId] = useState<string | null>(null);
 
-  // Modals state
-  const [selectedActivityToModify, setSelectedActivityToModify] = useState<Activity | null>(null);
-  const [isModifyModalOpen, setIsModifyModalOpen] = useState(false);
-
   const [selectedActivityForGallery, setSelectedActivityForGallery] = useState<Activity | null>(null);
-
-  const [isOptimizing, setIsOptimizing] = useState(false);
-  const [optimizationMetrics, setOptimizationMetrics] = useState<OptimizationMetrics | null>(null);
-  const [isOptimizationModalOpen, setIsOptimizationModalOpen] = useState(false);
-
   const [activeTransportTab, setActiveTransportTab] = useState<string>('bike');
 
   const fetchTrip = async () => {
@@ -63,37 +52,6 @@ export default function TripPage() {
       fetchTrip();
     }
   }, [tripId]);
-
-  const handleOptimizeTrip = async () => {
-    if (!trip || isOptimizing) return;
-    setIsOptimizing(true);
-    try {
-      const result = await api.optimizeTrip(tripId);
-      setTrip(result.trip);
-      setOptimizationMetrics(result.optimization);
-      setIsOptimizationModalOpen(true);
-    } catch (err) {
-      alert('Failed to optimize trip');
-    } finally {
-      setIsOptimizing(false);
-    }
-  };
-
-  const handleModifyActivitySubmit = async (action: 'replace' | 'remove', prompt?: string) => {
-    if (!selectedActivityToModify) return;
-    try {
-      const updatedTrip = await api.modifyActivity(
-        tripId,
-        activeDay,
-        selectedActivityToModify.id,
-        action,
-        prompt
-      );
-      setTrip(updatedTrip);
-    } catch (err) {
-      alert('Failed to modify activity');
-    }
-  };
 
   if (loading) {
     return (
@@ -134,12 +92,8 @@ export default function TripPage() {
         </Link>
       </div>
 
-      {/* Trip Header */}
-      <TripHeader
-        trip={trip}
-        onOptimizeClick={handleOptimizeTrip}
-        isOptimizing={isOptimizing}
-      />
+      {/* Trip Header (Pure Read-Only GET View) */}
+      <TripHeader trip={trip} />
 
       {/* Recommended Hotels & Stays Section */}
       <HotelRecommendationCard
@@ -222,10 +176,6 @@ export default function TripPage() {
               dayPlan={currentDayPlan}
               activeActivityId={activeActivityId}
               onSelectActivity={(id) => setActiveActivityId(id)}
-              onChangeActivity={(activity) => {
-                setSelectedActivityToModify(activity);
-                setIsModifyModalOpen(true);
-              }}
               onOpenGallery={(activity) => {
                 setSelectedActivityForGallery(activity);
               }}
@@ -243,30 +193,11 @@ export default function TripPage() {
         </div>
       </div>
 
-      {/* Modify Activity Dialog */}
-      <ModifyActivityModal
-        activity={selectedActivityToModify}
-        dayNumber={activeDay}
-        isOpen={isModifyModalOpen}
-        onClose={() => {
-          setIsModifyModalOpen(false);
-          setSelectedActivityToModify(null);
-        }}
-        onSubmit={handleModifyActivitySubmit}
-      />
-
       {/* Photo Gallery Modal */}
       <PhotoGalleryModal
         activity={selectedActivityForGallery}
         isOpen={Boolean(selectedActivityForGallery)}
         onClose={() => setSelectedActivityForGallery(null)}
-      />
-
-      {/* Optimization Modal */}
-      <OptimizationModal
-        metrics={optimizationMetrics}
-        isOpen={isOptimizationModalOpen}
-        onClose={() => setIsOptimizationModalOpen(false)}
       />
     </div>
   );

@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api, LocationSuggestion } from '@/lib/api';
+import { Trip } from '@/types';
 import { useSSE } from '@/hooks/useSSE';
 import { DurationSelector } from '@/components/planning/DurationSelector';
 import { InterestSelector } from '@/components/planning/InterestSelector';
-import { TransportSelector } from '@/components/planning/TransportSelector';
 import { PaceSelector } from '@/components/planning/PaceSelector';
 import { AgentExecutionStepper } from '@/components/chat/AgentExecutionStepper';
 import {
@@ -21,6 +21,7 @@ import {
   CheckCircle2,
   Navigation,
   Compass,
+  Bookmark,
 } from 'lucide-react';
 
 function PlanContent() {
@@ -47,13 +48,31 @@ function PlanContent() {
 
   const [duration, setDuration] = useState(0);
   const [interests, setInterests] = useState<string[]>([]);
-  const [transport, setTransport] = useState('');
   const [pace, setPace] = useState('');
   const [customPrompt, setCustomPrompt] = useState('');
 
   const [createdTripId, setCreatedTripId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [savedTrips, setSavedTrips] = useState<Trip[]>([]);
+
+  // Fetch saved trips from MongoDB on mount to allow instant reopening without API calls
+  useEffect(() => {
+    api
+      .listTrips()
+      .then((trips) => setSavedTrips(trips))
+      .catch(() => setSavedTrips([]));
+  }, []);
+
+  // Check if destination typed matches an already saved trip in MongoDB
+  const matchingSavedTrip =
+    destination.trim().length >= 2
+      ? savedTrips.find((t) => {
+          const destLower = destination.trim().toLowerCase();
+          const tripNameLower = t.destination.name.toLowerCase();
+          return tripNameLower.includes(destLower) || destLower.includes(tripNameLower);
+        })
+      : null;
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -152,7 +171,6 @@ function PlanContent() {
     destination.trim().length > 0 &&
     duration > 0 &&
     interests.length > 0 &&
-    transport !== '' &&
     pace !== '';
 
   // SSE Stream
@@ -170,7 +188,6 @@ function PlanContent() {
       if (!destination.trim()) setValidationError('Please enter a destination city or area.');
       else if (duration <= 0) setValidationError('Please select trip duration (e.g. 2 Days, 3 Days).');
       else if (interests.length === 0) setValidationError('Please select at least 1 interest.');
-      else if (!transport) setValidationError('Please select a preferred transport mode.');
       else if (!pace) setValidationError('Please select travelling places per day.');
       return;
     }
@@ -183,7 +200,7 @@ function PlanContent() {
         duration,
         preferences: {
           interests,
-          transport,
+          transport: 'bike', // Automatically provides all mobility options (Bike, Car, Public Transit)
           pace,
           customPrompt: customPrompt.trim() || undefined,
           userLocation: userLocation || undefined,
@@ -323,6 +340,59 @@ function PlanContent() {
                   <span>{locationSuccessMsg}</span>
                 </div>
               )}
+
+              {/* Existing Saved Itinerary Match Banner (Zero API Calls) */}
+              {matchingSavedTrip && (
+                <div className="p-4 rounded-2xl bg-cyan-950/60 border border-cyan-500/50 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center flex-shrink-0 border border-cyan-500/30 mt-0.5">
+                      <Bookmark className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-cyan-300 uppercase tracking-wider">
+                          Existing Itinerary in Database
+                        </span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">
+                          Zero API Calls
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-300 mt-0.5">
+                        You already generated a <strong>{matchingSavedTrip.duration}-Day {matchingSavedTrip.destination.name}</strong> itinerary saved in MongoDB.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/trip/${matchingSavedTrip.id}`)}
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold text-xs flex items-center gap-1.5 shadow-md hover:scale-105 transition-all whitespace-nowrap self-start sm:self-auto cursor-pointer"
+                  >
+                    <span>Open Saved {matchingSavedTrip.destination.name} Plan</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {/* Quick Suggestions of Previously Saved Trips */}
+              {!destination.trim() && savedTrips.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                  <span className="text-slate-400 text-[11px] font-medium flex items-center gap-1">
+                    <Bookmark className="w-3 h-3 text-cyan-400" />
+                    <span>Saved in MongoDB:</span>
+                  </span>
+                  {savedTrips.slice(0, 3).map((saved) => (
+                    <button
+                      key={saved.id}
+                      type="button"
+                      onClick={() => router.push(`/trip/${saved.id}`)}
+                      className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700/80 hover:border-cyan-500/50 hover:bg-cyan-500/10 text-slate-300 hover:text-cyan-300 text-[11px] font-semibold transition-all flex items-center gap-1"
+                    >
+                      <span>📍 {saved.destination.name} ({saved.duration}D)</span>
+                      <ArrowRight className="w-3 h-3 text-slate-500" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Duration Selector */}
@@ -339,15 +409,6 @@ function PlanContent() {
               selected={interests}
               onChange={(i) => {
                 setInterests(i);
-                if (validationError) setValidationError(null);
-              }}
-            />
-
-            {/* Transport Selector */}
-            <TransportSelector
-              value={transport}
-              onChange={(t) => {
-                setTransport(t);
                 if (validationError) setValidationError(null);
               }}
             />

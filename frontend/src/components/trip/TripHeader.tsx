@@ -5,11 +5,9 @@ import { Sparkles, MapPin, Calendar, Zap, DollarSign, Bike, Compass } from 'luci
 
 interface TripHeaderProps {
   trip: Trip;
-  onOptimizeClick: () => void;
-  isOptimizing: boolean;
 }
 
-export function TripHeader({ trip, onOptimizeClick, isOptimizing }: TripHeaderProps) {
+export function TripHeader({ trip }: TripHeaderProps) {
   const getTransportIcon = (mode?: string) => {
     switch (mode) {
       case 'bike':
@@ -69,8 +67,8 @@ export function TripHeader({ trip, onOptimizeClick, isOptimizing }: TripHeaderPr
               {trip.duration} {trip.duration === 1 ? 'Day' : 'Days'}
             </span>
 
-            <span className="text-xs font-medium px-3 py-1.5 rounded-xl bg-slate-800/90 text-slate-200 border border-slate-700/80 flex items-center gap-1.5 shadow-sm">
-              <span>{getTransportIcon(trip.preferences.transport)}</span>
+            <span className="text-xs font-medium px-3 py-1.5 rounded-xl bg-slate-800/90 text-cyan-300 border border-slate-700/80 flex items-center gap-1.5 shadow-sm">
+              <span>🛵 Bike • 🚗 Car • 🚌 Transit</span>
             </span>
 
             <span className="text-xs font-medium px-3 py-1.5 rounded-xl bg-slate-800/90 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 shadow-sm capitalize">
@@ -108,17 +106,12 @@ export function TripHeader({ trip, onOptimizeClick, isOptimizing }: TripHeaderPr
           )}
         </div>
 
-        {/* Action Button: Optimize My Trip */}
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onOptimizeClick}
-            disabled={isOptimizing}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 whitespace-nowrap"
-          >
-            <Sparkles className="w-4 h-4 fill-slate-950" />
-            <span>{isOptimizing ? 'Optimizing Routes...' : '✨ Optimize My Trip'}</span>
-          </button>
+        {/* Verified Plan Badge (Read-Only) */}
+        <div className="flex items-center gap-2">
+          <div className="px-4 py-2.5 rounded-2xl bg-slate-900/90 border border-slate-800 text-cyan-300 text-xs font-bold flex items-center gap-2 shadow-inner">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Saved Itinerary</span>
+          </div>
         </div>
       </div>
     </div>
